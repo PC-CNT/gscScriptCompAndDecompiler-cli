@@ -14,8 +14,10 @@
 #Библиотеки стандартные, но в результате некоторых проблем они могут не работать.
 
 import struct
-from tkinter import *
-from tkinter import messagebox as mb
+
+
+
+import argparse
 
 class GscFile:
     FileName = ''
@@ -187,14 +189,14 @@ class GscFile:
                        (0xE6, 'i', ''),
                        (0xE7, 'i', ''),
                        (0x1800, 'hhh', ''),
-                       (0x1810, 'hhh', ''), #!!!
+                       (0x1810, 'hhh', ''), 
                        (0x1900, 'hhh', ''),
                        (0x1910, 'hhh', ''),
                        (0x2500, 'hhh', ''),
-                       (0x1A01, 'hhh', ''), #!!!
+                       (0x1A01, 'hhh', ''), 
                        (0x1A00, 'hhh', ''),
                        (0x4400, 'hhh', ''),
-                       (0x4810, 'hhh', ''), #!!!
+                       (0x4810, 'hhh', ''), 
                        (0x4900, 'hhh', ''),
                        (0x4A00, 'hhh', ''),
                        (0x5800, 'hhh', ''),
@@ -204,16 +206,16 @@ class GscFile:
                        (0x8800, 'hhh', ''),
                        (0x8A00, 'hhh', ''),
                        (0x9800, 'hhh', ''),
-                       (0x9810, 'hhh', ''), #!!!
+                       (0x9810, 'hhh', ''), 
                        (0x9A00, 'hhh', ''),
                        (0xA100, 'hhh', ''),
                        (0xA200, 'hhh', ''),
-                       (0xA201, 'hhh', ''), #!!
+                       (0xA201, 'hhh', ''), 
                        (0xA400, 'hhh', ''),
                        (0xA500, 'hhh', ''),
                        (0xA600, 'hhh', ''),
                        (0xA800, 'hhh', ''),
-                       (0xA810, 'hhh', ''), #!!!
+                       (0xA810, 'hhh', ''), 
                        (0xA900, 'hhh', ''),
                        (0xB400, 'hhh', ''),
                        (0xB800, 'hhh', ''),
@@ -251,9 +253,9 @@ class GscFile:
     def __init__(self, FileName, Mode):
         self.FileName = FileName
         if (Mode == 0):
-            self.File = open(self.FileName + ".gsc", mode="rb")
+            self.File = open(self.FileName, mode="rb")
         else:
-            self.File = open(self.FileName + ".txt", mode="r", encoding="shift_jis")
+            self.File = open(self.FileName, mode="r", encoding="shift_jis")
     #Техническое отображение:
     def PrintFilePmt(self):
         for i in range(0, len(self.FileParametrs)):
@@ -331,7 +333,7 @@ class GscFile:
                 else:
                     print(self.Commands[CommandNumber])
                 print(self.CommandArgs[CommandNumber])
-            #!!!
+            
             CommandNumber += 1
         print("Контроль: " + str(Reader) + " : " + str(self.FileParametrs[2]))
         self.File.seek(self.FileParametrs[1], 0)
@@ -791,256 +793,38 @@ class GscFile:
     def WriteFile(self):
         self.File = open(self.FileName + ".txt", mode="w", encoding="shift_jis")
 
-class GUI():
-    root = Tk()
-    Language = 'ENG' #RUS
-    FileName = ''
-    LeftSide = Frame(root)
-    LeftTop = Frame(root)
-    LeftMiddle = Frame(root)
-    LeftBottom = Frame(root)
-    RussianLang = Button(root)
-    EnglishLang = Button(root)
-    InputName = Entry(root)
-    Definer = Button(root)
-    Clearer = Button(root)
-    Undefiner = Button(root)
-    SpacerTop = LabelFrame(root)
-    Rebuild = Button(root)
-    Decompile = Button(root)
-    Compile = Button(root)
-    SpacerBottom = LabelFrame(root)
-    CommonHelper = Button(root)
-    CommandHelper = Button(root)
-    SyntaxHelper = Button(root)
-    
-    def __init__(self):
-        self.root['background']='white'
-        self.root.resizable(width=False, height=False)
-        
-        self.root.geometry("400x420+{}+{}".format((self.root.winfo_screenwidth()-400)//2, (self.root.winfo_screenheight()-420)//2))
-        self.root.title("GscScriptCompAndDecompiler by Tester 2.0")
-            
-        self.LeftSide = Frame(self.root, width=400, heigh=600)
-        self.LeftSide.pack(side='left')
+parser = argparse.ArgumentParser(description="")
+parser.add_argument("-m", "--mode", help="", choices=["rebuild", "decompile", "compile"], required=True)
+parser.add_argument("-i", "--input", help="Input file", required=True)
+args = parser.parse_args()
 
-        self.LeftTop = Frame(self.LeftSide, width=400, height=32, bg="grey")
-        self.LeftMiddle = Frame(self.LeftSide, width=400, height=62, bg="grey")
-        self.LeftBottom = Frame(self.LeftSide, width=400, height=568, bg="grey")
-        self.LeftTop.pack_propagate(False)
-        self.LeftTop.pack()
-        self.LeftMiddle.pack_propagate(False)
-        self.LeftMiddle.pack()
-        self.LeftBottom.pack()
-    def InitLangButtons(self):
-        self.RussianLang = Button(self.LeftTop, command=self.SetLangRus, bg='white', activebackground='gray', font = 'calibri 12', text='　 　　　 　　　РУССКИЙ')
-        self.EnglishLang = Button(self.LeftTop, command=self.SetLangEng, bg='white', activebackground='gray', font = 'calibri 12', text='ENGLISH　　　 　　　　 　')
-        self.RussianLang.pack(side='left')
-        self.EnglishLang.pack(side='right')
-    def InitLeftSide(self):
-        self.InputName = Entry(self.LeftMiddle, width=400, bd=4, fg="black", font='calibri 12', state=NORMAL)
-        self.Definer = Button(self.LeftMiddle, command=self.Define, bg='white', activebackground='gray', font = 'calibri 12', text='                  DEFINE')
-        self.Clearer = Button(self.LeftMiddle, command=self.Clear, bg='white', activebackground='gray', font = 'calibri 12', text='          CLEAR          ')
-        self.Undefiner = Button(self.LeftMiddle, command=self.Undefine, bg='white', activebackground='gray', font = 'calibri 12', text='UNDEFINE               ')
-        self.InputName.pack(side='top')
-        self.Definer.pack(side='left')
-        self.Clearer.pack(side='left')
-        self.Undefiner.pack(side='left')
-        self.SpacerTop = LabelFrame(self.LeftBottom, bg='white', height=126, width=400, font = 'calibri 12', text = "COMMANDS:")
-        self.SpacerTop.pack_propagate(False)
-        self.SpacerTop.pack(side='top')
-
-        self.Rebuild = Button(self.SpacerTop, command=self.RebuildGscFromGsc, bg='white', activebackground='gray', font = 'calibri 12', text='Rebuild .gsc from .gsc (.gsc -> .gsc)')
-        self.Rebuild.pack(side='top', fill="x", expand='yes')
-        self.Decompile = Button(self.SpacerTop, command=self.DecompileToTxt, bg='white', activebackground='gray', font = 'calibri 12', text='Decompile .gsc to .txt (.gsc -> .txt)')
-        self.Decompile.pack(side='top', fill="x", expand='yes')
-        self.Compile = Button(self.SpacerTop, command=self.CompileFromTxt, bg='white', activebackground='gray', font = 'calibri 12', text='Compile .txt to .gsc (.txt -> .gsc)')
-        self.Compile.pack(side='top', fill="x", expand='yes')
-        
-        self.SpacerBottom = LabelFrame(self.LeftBottom, bg='white', height=126, width=400, font = 'calibri 12', text = "HELP:")
-        self.SpacerBottom.pack_propagate(False)
-        self.SpacerBottom.pack()
-
-        self.CommonHelper = Button(self.SpacerBottom, command=self.CommonHelp, bg='white', activebackground='gray', font = 'calibri 12', text='Common help')
-        self.CommonHelper.pack(side='top', fill="x", expand='yes')
-        self.CommandHelper = Button(self.SpacerBottom, command=self.CommandHelp, bg='white', activebackground='gray', font = 'calibri 12', text='Command help')
-        self.CommandHelper.pack(side='top', fill="x", expand='yes')
-        self.SyntaxHelper = Button(self.SpacerBottom, command=self.SyntaxHelp, bg='white', activebackground='gray', font = 'calibri 12', text='Syntax help')
-        self.SyntaxHelper.pack(side='top', fill="x", expand='yes')
-        
-        self.Outer=Text(self.LeftBottom, width=400, height=3, font='arial 12', state=DISABLED)
-        self.Outer.pack()
-
-    #Техническое:
-    def SetLangRus(self):
-        self.Language = "RUS"
-        self.root.title("GscScriptCompAndDecompiler от Tester-а 2.0")
-        self.Definer['text'] = "           ОПРЕДЕЛИТЬ"
-        self.Clearer['text'] = " ОЧИСТИТЬ "
-        self.Undefiner['text'] = "РАЗОПРЕДЕЛИТЬ        "
-        self.SpacerTop['text'] = 'КОМАНДЫ:'
-        self.Rebuild['text'] = 'Перестроить .gsc из .gsc (.gsc -> .gsc)'
-        self.Decompile['text'] = 'Декомпилировать .gsc в .txt (.gsc -> .txt)'
-        self.Compile['text'] = 'Компилировать .txt в .gsc (.txt -> .gsc)'
-        self.SpacerBottom['text'] = 'ПОМОЩЬ:'
-        self.CommonHelper['text'] = 'Общая помощь'
-        self.CommandHelper['text'] = 'Помощь по командам'
-        self.SyntaxHelper['text'] = 'Помощь по синтаксису'
-        self.Outer['state'] = NORMAL
-        self.Outer.delete(1.0, END)
-        self.Outer.insert(1.0, "Язык успешно сменён.")
-        self.Outer['state'] = DISABLED
-    def SetLangEng(self):
-        self.Language = "ENG"
-        self.root.title("GscScriptCompAndDecompiler by Tester 2.0")
-        self.Definer['text'] = "                  DEFINE"
-        self.Clearer['text'] = "          CLEAR          "
-        self.Undefiner['text'] = "UNDEFINE               "
-        self.SpacerTop['text'] = 'COMMANDS:'
-        self.Rebuild['text'] = 'Rebuild .gsc from .gsc (.gsc -> .gsc)'
-        self.Decompile['text'] = 'Decompile .gsc to .txt (.gsc -> .txt)'
-        self.Compile['text'] = 'Compile .txt to .gsc (.txt -> .gsc)'
-        self.SpacerBottom['text'] = 'HELP:'
-        self.CommonHelper['text'] = 'Common help'
-        self.CommandHelper['text'] = 'Command help'
-        self.SyntaxHelper['text'] = 'Syntax help'
-        self.Outer['state'] = NORMAL
-        self.Outer.delete(1.0, END)
-        self.Outer.insert(1.0, "The language was succesfully changed.")
-        self.Outer['state'] = DISABLED
-    def Clear(self):
-        if (self.InputName['state'] == NORMAL):
-            self.InputName.delete(0, END)
-            self.Outer['state'] = NORMAL
-            self.Outer.delete(1.0, END)
-            if (self.Language == 'RUS'):
-                self.Outer.insert(1.0, "Поле ввода имени успешно очищено.")
-            else:
-                self.Outer.insert(1.0, "The name entry was succesfully cleared.")
-            self.Outer['state'] = DISABLED
-        else:
-            self.Outer['state'] = NORMAL
-            self.Outer.delete(1.0, END)
-            if (self.Language == 'RUS'):
-                self.Outer.insert(1.0, "Очистка не удалась, ибо имя определено.")
-            else:
-                self.Outer.insert(1.0, "Can't clear, for the name is defined.")
-            self.Outer['state'] = DISABLED
-    def Define(self):
-        self.FileName = self.InputName.get()
-        try:
-            if ((self.FileName[-4:] == ".gsc") or (self.FileName[-4:] == '.txt')):
-                self.FileName = self.FileName[:-4]
-                self.InputName.delete(0, END)
-                self.InputName.insert(0, self.FileName)
-        except:
-            pass
-        self.InputName['state'] = DISABLED
-        self.Outer['state'] = NORMAL
-        self.Outer.delete(1.0, END)
-        if (self.Language == 'RUS'):
-            self.Outer.insert(1.0, "Поле ввода имени успешно определено.")
-        else:
-            self.Outer.insert(1.0, "The name entry was succesfully defined.")   
-        self.Outer['state'] = DISABLED  
-    def Undefine(self):
-        self.FileName = ''
-        self.InputName['state'] = NORMAL
-        self.Outer['state'] = NORMAL
-        self.Outer.delete(1.0, END)
-        if (self.Language == 'RUS'):
-            self.Outer.insert(1.0, "Поле ввода имени успешно разопределено.")
-        else:
-            self.Outer.insert(1.0, "The name entry was succesfully undefined.")    
-        self.Outer['state'] = DISABLED      
-    def CommonHelp(self):
-        if (self.Language == "RUS"):
-            mb.showwarning("Общая помощь", """Данная программа разработана для корректной работы с файлами .gsc движка codeX RScript, известным также как Liar-soft Engine и raiL-soft Engine. Движок относительно простой, как и относительно просты его форматы, в частности .gsc, с которым, впрочем, есть проблематичные моменты, что купируются своеобразной схемой декомпиляции и компиляции. Из-за которой, впрочем, в некоторых случаях возможны проблемы.\n\nДанная программа позволяет:\n1. Перестраивать .gsc-файлы из самих себя, тем самым по сути их оптимизируя, ибо в ряде .gsc-файлов могут содержаться некоторые мусорные элементы, в частности остаточные нули в конце. Тем не менее, не факт, что все мусорные элементы будут прибраны. Также позволяет просматривать параметры .gsc и ход неизвестный команд, что может быть полезно при анализе кода.\n2. Декомпиляция .gsc в .txt, позволяющая сколь угодно (в рамках синтаксиса, команд и прочего) редактировать скрипты. Например, с помощью средства добавить новое сообщение проще простого.\n3. Компиляция .txt в .gsc. Она в свою очередь позволяет пересобирать .gsc на основе импровизированного разобранного кода. Для данной команды старый .gsc-скрипт не требуется.\n\nДля использования:\n1. Перетащите либо скрипт .gsc, либо файл .txt с декомпилированными данными в директорию средства.\n2. Напишите его имя в поле ввода и нажмите "ОПРЕДЕЛИТЬ".\n3. Используйте комманды снизу.""")
-        else:
-            mb.showwarning("Common help", """This program was developed for correctly working with .gsc files of the engine codeX Rscript, which also called as Liar-soft Engine and raiL-soft Engine. The engine is rather simple much like it's formats, for example .gsc, with which through may be some problematic moments. Still the moments are ceasing by the specific decompile and compile. But the scheme can also cause problems it some situations.\n\nThis program allow you to:\n1. Rebuild .gsc-files from themselves so you can optimize them, for in many of .gsc-files there may be some trash elements. For example some number of zeros in the end. But this command is not garantee that all trash elements will be removed. This command also allow you to see .gsc-file's parametrs and unknown commands. It may be useful for code analysis.\2. .gsc to .txt decomple. It allow you to edit scripts as you like (with limitations of syntax, of course). For example, with this tool you can easily add new message.\n3. .txt to .gsc compile. This allow you to rebuild .gsc from decompiled and may be edited ealier code. It doesn't need an ealier .gsc to present for run.\n\nFor usage:\n1. Drag the .gsc script or .txt with decompiled data to the tool directory.\n2. Write the file name in the tool entry and push the "DEFINE".\n3. Use the commands below.""")
-    def CommandHelp(self):
-        if (self.Language == "RUS"):
-            mb.showwarning("Помощь по командам", """Увы, команд известно мало (но не их структур), а их аргументов ещё меньше. Что, впрочем, может измениться в будущем. Всякая известная команда в файле обозначена некоторой строкой.\n\nИтак, приведём базовые известные команды с аргументами:\n\n3 (0x03): JUMP_UNLESS.\nАргументы: [метка].\n5 (0x05): JUMP.\nАргументы: [метка].\n12 (0x0C): CALL_SCRIPT.\nАргументы: [номер скрипта, ???]\n13 (0x0D): PAUSE.\nАргументы: [время в секундах].\n14 (0x0E): CHOICE.\nАргументы: [???, ???, ???, ???, ???, ???, ???, -1, -1, -1, -1, -1, ???, ???, ???].\n20 (0x14): IMAGE_GET.\nАргументы: [индекс картинки (из имени), ???].\n26 (0x1A): IMAGE_SET.\nАргументы: [].\n28 (0x1C): BLEND_IMG.\nАргументы: [???, тип1, тип2].\n30 (0x1E): IMAGE_DEF.\nАргументы: [???, ???, ???, ???, ???, ???].\n81 (0x51): MESSAGE.\nАргументы: [???, индекс гласа (из имени), ???, -1, -1, ???].\n82 (0x52): APPEND_MESSAGE.\nАргументы: [???, ???, ???, ???, -1, ???].\n83 (0x53): CLEAR_MESSAGE_WINDOW.\nАргументы: [???].\n121 (0x79): GET_DIRECTORY.\nАргументы: [???, -1].\n200 (0xC8): READ_SCENARIO.\nАргументы: [label, ???, ???, ???, ???, ???, ???, ???, ???, ???, ???].\n255 (0xFF): SPRITE.\nАргументы: [режим, позиция, индекс картинки, ???, ???].\n13568 (0x3500): AND.\nАргументы: [???, ???, ???].\n18432 (0x4800): EQUALS.\nАргументы: [???, ???, ???].\n21504 (0x5400): GREATER_EQUALS.\nАргументы: [???, ???, ???].\n43520 (0xAA00): ADD.\nАргументы: [???, ???, ???].\n61696 (0xF100): ASSIGN.\nАргументы: [???, ???].""")
-        else:
-            mb.showwarning("Command help", """Unfortunately, the number of known commands aren't big (but not of the structures). It may change it the future. All known commands are defined in decomilated file as a string.\n\nWell, let's show you a basic known commands with the arguments:\n\n3 (0x03): JUMP_UNLESS.\nArguments: [label]\n5 (0x05): JUMP.\nArguments: [label].\n12 (0x0C): CALL_SCRIPT.\nArguments: [script number, ???]0\n13 (0x0D): PAUSE.\nArguments: [time in seconds].\n14 (0x0E): CHOICE.\nArguments: [???, ???, ???, ???, ???, ???, ???, -1, -1, -1, -1, -1, ???, ???, ???].\n20 (0x14): IMAGE_GET.\nArguments: [image index (from the name), ???].\n26 (0x1A): IMAGE_SET.\nArguments: [].\n28 (0x1C): BLEND_IMG.\nArguments: [???, type1, type2].\n30 (0x1E): IMAGE_DEF.\nArguments: [???, ???, ???, ???, ???, ???].\n81 (0x51): MESSAGE.\nArguments: [???, voice index (from the name), ???, -1, -1, ???].\n82 (0x52): APPEND_MESSAGE.\nArguments: [???, ???, ???, ???, -1, ???].\n\n83 (0x53): CLEAR_MESSAGE_WINDOW.\nArguments: [???].121 (0x79): GET_DIRECTORY.\nArguments: [???, -1].\n200 (0xC8): READ_SCENARIO.\nArguments: [метка, ???, ???, ???, ???, ???, ???, ???, ???, ???, ???].\n255 (0xFF): SPRITE.\nArguments: [mode, position, image index, ???, ???].\n13568 (0x3500): AND.\nArguments: [???, ???, ???].\n18432 (0x4800): EQUALS.\nArguments: [???, ???, ???].\n21504 (0x5400): GREATER_EQUALS.\nArguments: [???, ???, ???].\n43520 (0xAA00): ADD.\nArguments: [???, ???, ???].\n61696 (0xF100): ASSIGN.\nArguments: [???, ???].""")
-    def SyntaxHelp(self):
-        if (self.Language == "RUS"):
-            mb.showwarning("Помощь по синтаксису", """Для тех, кто скрипты именно редактировать жаждет, сие крайне важно знать. Синтаксис в целом прост, но имеет ряд особенностей.\n\n|"$" в начале строки обозначает однострочный комментарий.\n"#" в начале строки есть определение команды.\n\n"[..., ..., ...]" есть форма описания аргументов функции (разделяются запятой) и следует сразу после определения команды.\n\n"@" есть метка, на кою ссылаются некоторые команды.\n\nАргумент "-1" значит, что он связан с индексом следующей строки.\n\n">" обозначает строк начало.\nПосле сего идёт либо показатель изначального индекса строки, либо -1. -1 значит, что строка связанная. Связанные строки всегда следуют после задачи связанных аргументов.\nВАЖНО: ИНДЕКСЫ ПОСЛЕ ">" ОТОБРАЖАЮТ ЛИШЬ ИЗНАЧАЛЬНЫЕ ИНДЕКСЫ! ПРИ КОМПИЛЯЦИИ ИНДЕКС СТРОКИ БЕРЁТСЯ ЛИШЬ ИЗ НОМЕРА ">" В СКРИПТЕ!\nВАЖНО: НЕ ВСЕ СВЯЗНАННЫЕ ИНДЕКСЫ БЫЛИ НАЙДЕНЫ!""")
-        else:
-            mb.showwarning("Syntax help", """For those who desire for scripts to edit it's very important. The syntax is rather simple, but it have some specific moments.\n\n"$" is the string's beginning is for one-string comment.\n\n"#" in the string's beginning is for defination of command.\n\n"[..., ..., ...]" is for function argument's splitted with "," form. It goes strictly on the next line after the command defination.\n\n"@" is a label, to which some arguments are connecting.\n\nA "-1" argument means it connected with next string index.\n\n">" is for string beginning.\nAfter its goes mark of primar index of string or -1. If it's -1, the string is connected. Connected strings always goes after the defination of connected arguments.\nDO NOTE: INDEXES AFTER ">" SHOWS ONLY PRIMAR INDEXES! THEN COMPILE PROGRAM TAKE A STRING INDEX ONLY FROM THE NUMBER OF ">" IN SCRIPT!\nDO NOTE: NOT AN ALL OF CONNECTED INDEXES WAS FOUND!""")
-    #Связь с .gsc:
-    def RebuildGscFromGsc(self):
-        try:
-            NewScript = GscFile(self.FileName, 0)
-            NewScript.ReinitAll()
-            NewScript.FileName = self.FileName
-            NewScript.RemakeGscFromGsc()
-            self.Outer['state'] = NORMAL
-            self.Outer.delete(1.0, END)
-            if (self.Language == 'RUS'):
-                self.Outer.insert(1.0, ".gsc успешно перестроен.")
-            else:
-                self.Outer.insert(2.0, ".gsc was succesfully rebuilt.")
-            self.Outer['state'] = DISABLED
-        except:
-            self.Outer['state'] = NORMAL
-            self.Outer.delete(1.0, END)
-            if (self.Language == 'RUS'):
-                self.Outer.insert(1.0, "Что-то пошло не так...\nНе удалось перестроить сей .gsc...")
-            else:
-                self.Outer.insert(1.0, "Something went wrong...\nCouldn't rebuilt this .gsc...")
-            self.Outer['state'] = DISABLED
-    def DecompileToTxt(self):
-        NewScript = GscFile(self.FileName, 0)
+if (args.mode == "rebuild"):
+    try:
+        NewScript = GscFile(args.input, 0)
         NewScript.ReinitAll()
-        NewScript.FileName = self.FileName
-        NewScript.DecompileGscToTxt()
-        try:
-            #NewScript = GscFile(self.FileName, 0)
-            #NewScript.ReinitAll()
-            #NewScript.FileName = self.FileName
-            #NewScript.DecompileGscToTxt()
-            self.Outer['state'] = NORMAL
-            self.Outer.delete(1.0, END)
-            if (self.Language == 'RUS'):
-                self.Outer.insert(1.0, ".gsc успешно декомпилирован.")
-            else:
-                self.Outer.insert(2.0, ".gsc was succesfully decompiled.")
-            self.Outer['state'] = DISABLED
-        except:
-            self.Outer['state'] = NORMAL
-            self.Outer.delete(1.0, END)
-            if (self.Language == 'RUS'):
-                self.Outer.insert(1.0, "Что-то пошло не так...\nНе удалось декомпилировать сей .gsc...")
-            else:
-                self.Outer.insert(1.0, "Something went wrong...\nCouldn't decompile this .gsc...")
-            self.Outer['state'] = DISABLED
-    def CompileFromTxt(self):
-        NewScript = GscFile(self.FileName, 1)
-        NewScript.ReinitAll()
-        NewScript.FileName = self.FileName
-        NewScript.CompileTxtToGsc()
-        try:
-            #NewScript = GscFile(self.FileName, 1)
-            #NewScript.ReinitAll()
-            #NewScript.FileName = self.FileName
-            #NewScript.CompileTxtToGsc()
-            self.Outer['state'] = NORMAL
-            self.Outer.delete(1.0, END)
-            if (self.Language == 'RUS'):
-                self.Outer.insert(1.0, ".gsc успешно компилирован.")
-            else:
-                self.Outer.insert(2.0, ".gsc was succesfully compiled.")
-            self.Outer['state'] = DISABLED
-        except:
-            self.Outer['state'] = NORMAL
-            self.Outer.delete(1.0, END)
-            if (self.Language == 'RUS'):
-                self.Outer.insert(1.0, "Что-то пошло не так...\nНе удалось компилировать сей .txt...")
-            else:
-                self.Outer.insert(1.0, "Something went wrong...\nCouldn't compile this .txt...")
-            self.Outer['state'] = DISABLED
-CurrentSession = GUI()
-CurrentSession.InitLangButtons()
-CurrentSession.InitLeftSide()
-CurrentSession.root.mainloop()
+        NewScript.FileName = args.input
+        NewScript.RemakeGscFromGsc()
+        print(2.0, ".gsc was succesfully rebuilt.")
+    except:
+        print(1.0, "Something went wrong...\nCouldn't rebuilt this .gsc...")
+
+if (args.mode == "decompile"):
+    NewScript = GscFile(args.input, 0)
+    NewScript.ReinitAll()
+    NewScript.FileName = args.input
+    NewScript.DecompileGscToTxt()
+    try:
+        print(".gsc was succesfully decompiled.")
+    except:
+        print("Something went wrong...\nCouldn't decompile this .gsc...")
+
+if (args.mode == "compile"):
+    NewScript = GscFile(args.input, 1)
+    NewScript.ReinitAll()
+    NewScript.FileName = args.input
+    NewScript.CompileTxtToGsc()
+    try:
+        print(".gsc was succesfully compiled.")
+    except:
+        print("Something went wrong...\nCouldn't compile this .txt...")
+
